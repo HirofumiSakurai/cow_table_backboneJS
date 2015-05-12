@@ -1,0 +1,1 @@
+<a href="/kine/#<%- ear_num %>" class="cow-number"><%- ear_num %></a>,

@@ -1,0 +1,15 @@
+#cow-list {
+margin: 0;
+padding: 0;
+list-style-type: none;
+}
+
+#cow-list li {
+float: left;
+width: 3em;
+margin-right: 5px;
+padding: 2px;
+border: 1px #ffb366 solid;
+background-color: #fffdee;
+text-align: center;
+}
