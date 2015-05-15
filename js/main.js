@@ -26,8 +26,12 @@ require(
 	var kine_collection  = new KineCollection();
 	var myRouter = new KineRouter({collection: kine_collection});
 	myRouter.collection = kine_collection;
-	Backbone.history.start();
 
-	//var app_view = new KineView({collection: kine_collection});
+	var app_view = new KineView({
+	    collection: kine_collection,
+	    router: myRouter
+	});
+	app_view.router = myRouter;
+	Backbone.history.start();
     }
 );

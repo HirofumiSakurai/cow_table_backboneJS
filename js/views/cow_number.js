@@ -11,12 +11,20 @@ define([
 
 	template: _.template(cowNumberTemplate),
 
+	events: {
+    	    "click .cow-number"  : "navi2cow"
+	},
+
 	initialize: function() {
 	},
 
 	render: function() {
 	    this.$el.html(this.template(this.model.toJSON()));
 	    return this;
+	},
+
+	navi2cow: function() {
+	    this.router.navigate("#"+this.model.attributes.id, {trigger: true});
 	}
     });
     return CowNumberView;

@@ -17,7 +17,36 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 	  t50:'', created_at:'',updated_at:''
       },
 
+      root: "/rails/kine/",
+
       initialize: function() {
+	  this.url = this.root;
+      },
+
+      fetchById: function(options) {
+      	  var urlop = {
+      	      url: this.url + this.attributes.id + ".json?redirect=sql2"
+      	  };
+	  options = ( typeof optoins === 'undefined')?
+	      urlop: _.extend(options, urlop);
+      	  this.fetch(options);
+      },
+      
+      fetch: function(options){
+	  this.url = this.root + this.attributes.id;
+	  Backbone.Model.prototype.fetch.call(this, options);
+      },
+      
+      save: function(options){
+	  if( this.attributes.id )
+	      this.url = this.root + this.attributes.id;
+	  Backbone.Model.prototype.save.call(this, options);
+      },
+      
+      create: function(){
+	  this.attributes.id = undefined;
+	  this.url = this.root;
+	  this.save();
       }
   });
   return CowModel;

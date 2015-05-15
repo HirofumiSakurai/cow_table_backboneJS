@@ -1,4 +1,3 @@
-<div id="button"></div><p />
 <ul id="cow-p-entity">
   <li>
     <div class="cow-p-tag">耳標番号:</div>
@@ -24,6 +23,7 @@
     <div class="cow-p-tag">母親ID:</div>
     <div class="cow-p-ent"><%- parent %></div>
   </li>
+  <li><div id="button"></div></li>
 </ul><p />
 
 <div id="cow-daughter-tag">娘牛リスト</div>

@@ -13,3 +13,131 @@ border: 1px #ffb366 solid;
 background-color: #fffdee;
 text-align: center;
 }
+
+#cow-p-entity li {
+    display: inline;
+    font-weight: bold;
+    margin: 5px;
+    font-size: 120%;
+    white-space: nowrap;
+}
+
+#cow-p-entity li div {
+    display: inline;
+}
+
+.cow-p-tag{
+    font-weight: normal;
+    text-decoration: underline;
+    font-size: 80%;
+}
+
+#button {
+    float: right;
+}
+
+#button input {
+    margin-right: 3ex;
+}
+
+#toUpdate {
+    color: blue;
+}
+
+#toDelete {
+    color: red;
+}
+
+#ear_num {
+    width: 8em;
+}
+
+#name {
+    width: 12em;
+}
+
+#sex {
+    width: 2em;
+}
+
+#owner_id {
+    width: 8em;
+}
+
+#parent {
+    width: 8em;
+}
+
+#cow-daughter-tag {
+    text-decoration: underline;
+}
+
+#daughter-list {
+}
+
+#daughter-list div{
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#daughter-list li {
+    display: inline;
+    margin: 2px;
+    white-space: nowrap;
+}
+
+#cow-ai-tag {
+    margin-top: 3em;
+    text-decoration: underline;
+}
+
+#create-ai-log {
+    cursor:pointer;
+    margin-left: 3em;
+}
+
+#ai-log-list {
+}
+
+#ai-log-list li{
+    top-margin: 10em;
+    margin-top: 7px;
+}
+
+#ai-log-list li div {
+display: inline;
+width: 25em;
+}
+
+#ai-log-list li div div {
+cursor: pointer;
+margin-right: 5px;
+width: 20em;
+padding: 2px;
+border: 1px #ffb366 solid;
+background-color: #fffdee;
+}
+
+.delete-ai-log {
+    cursor: pointer;
+    width: 40px;
+    height: 16px;
+    font-size: 75%;
+}
+
+#ai-log-list li div div input:hover {
+    color: red;
+}
+
+#additional {
+    margin-top: 10em;
+}
+
+#additional div {
+    white-space: nowrap;
+    float: left;
+}
+
+.tinp {
+    width: 3ex;
+}
