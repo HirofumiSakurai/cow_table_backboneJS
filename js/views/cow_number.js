@@ -24,7 +24,8 @@ define([
 	},
 
 	navi2cow: function() {
-	    this.router.navigate("#"+this.model.attributes.id, {trigger: true});
+	    Backbone.history.navigate(
+		this.route["cow"] +this.model.attributes.id, {trigger: true});
 	}
     });
     return CowNumberView;

@@ -8,56 +8,52 @@ define([
     'models/cow',
     'models/aiLog',
     'views/ai_log_item',
-    'views/aiLog'
+    'views/aiLog',
+    'jqueryNumeric'
 ], function($, _, Backbone, cowTemp, cowTempE, daughterTemp,
 	    Cow, AiLogModel,AiLogItem, AiLog){
     var CowView = Backbone.View.extend({
 
-	el: '#root',
+	el: 'div',
 
 	template: _.template(cowTemp),
 	templateE: _.template(cowTempE),
 	daughterTemplate: _.template(daughterTemp),
 
 	events: {
-	    "click #back"     : "navi2backward",
-	    "click #toUpdate" : "navi2update",
-	    "click #toDestroy": "navi2destroy",
-	    "click #save"     : "saveModel",
-	    "click #destroy"  : "destroyModel",
-	    "click #cancel"   : "navi2backward",
-	    "click #create-ai-log": "createAiLog"
+	    "click #back"     : "navi2backward",    // Read
+	    "click #toupdate" : "navi2update",      // Read
+	    "click #toDestroy": "navi2destroy",     // Read
+	    "click #save"     : "saveModel",        // Cread, Update
+	    "click #destroy"  : "destroyModel",     // Delete
+	    "click #cancel"   : "navi2cancel",      // Cread, Update, Delete
+	    "click #create-ai-log": "createAiLog"   
 	},
 
 	initialize: function() {
-	    this.method = this.model.attributes.method; // lost after fetch;
-	    if( this.method === "create" ){
-		this.render();
-	    }
-	    if(this.model.attributes.fetch === "true"){
-		this.listenTo(this.model, 'sync', this.render2);
-		this.model.fetchById();
-	    } else {
-		this.listenTo(this.model, 'sync', this.render);
-		this.render();
-	    }
 	},
 
 	render: function() {
 	    this.view_list = [];
 	    if( _.find(["read", "destroy"], function(e){
 		return this.method === e}, this)){
-		this.$el.html(this.template(this.model.attributes));
-		_.each(this.model.attributes.daughters, function(d){
-		    $('#daughter-list').append(this.daughterTemplate(d));
+		this.$el.append(this.template(this.model.attributes));
+		_.each(this.model.daughters, function(d){
+		    if(this.collection.get(d.attributes.id) )
+			$('#daughter-list').append(this.daughterTemplate(d));
+		    else
+			$('#daughter-list').append(d.ear_num);
 		}, this);
-		_.each(this.model.attributes.ai_logs, function(a){
-		    var view = new AiLogItem({
-			model: a,
-		    });
-		    this.view_list.push(view);
-		    this.$('#ai-log-list').append(view.render().el);
-		}, this);
+		_.each(
+		    this.logCollection.where({
+		        cow_no: this.model.attributes.id }).models,
+		    function(a){
+			var view = new AiLogItem({
+			    model: a,
+			});
+			this.view_list.push(view);
+			this.$('#ai-log-list').append(view.render().el);
+		    }, this);
 		if(this.method === "destroy"){
 		    this.$('#button').append(
 			'<input type="button" value="取り消し" id="cancel" />'
@@ -68,49 +64,36 @@ define([
 		    this.$('#button').append(
 			'<input type="button" value="変更" id="toUpdate" />');
 		    this.$('#button').append(
-			'<input type="button" value="戻る" id="cancel" />');
+			'<input type="button" value="戻る" id="back" />');
 		}
 	    } else if( _.find(["create", "update"], function(e){
 		return this.method === e}, this)){
 		this.$el.html(this.templateE(this.model.attributes));
-		if(this.model.attributes.method === "create"){
-		    this.$('#button').append(
-			'<input type="button" value="取り消し" id="cancel" />'
-		       +'<input type="button" value="作成" id="create" />');
-		} else if(this.model.attributes.method === "update"){
-		    this.$('#button').append(
-			'<input type="button" value="取り消し" id="cancel" />'
-		       +'<input type="button" value="変更" id="update" />');
-		} 
+		this.setNumerics();
 	    }
 	    return this;
 	},
 
-	render2: function(){
-	    // なぜか、modelにfetchすると、model.attribute[0] に値が返される!
-	    if( typeof this.model.attributes[0] !== "undefined"){
-		this.model.attributes = this.model.attributes[0];
-	    }
-	    this.listenTo(this.model, 'sync', this.render);
-	    this.render();
+	navi2backward: function() {
+	    Backbone.history.navigate(this.route["back"]);
 	},
 
-	navi2backward: function() {
-	    Backbone.history.navigate("", {trigger: true});
+	navi2next: function() {
+	    Backbone.history.navigate(
+		this.route["next"]
+		    +this.model.attributes.id, {trigger: true});
 	},
 
 	navi2update: function() {
 	    Backbone.history.navigate(
-		"cowU/"+ this.model.attributes.id,
-		{trigger: true}
-	    );
+		this.route["update"]
+		    +this.model.attributes.id, {trigger: true});
 	},
 
-	navi2destroy: function() {
+	navi2destory: function() {
 	    Backbone.history.navigate(
-		"cowD/"+ this.model.attributes.id,
-		{trigger: true}
-	    );
+		this.route["destroy"]
+		    +this.model.attributes.id, {trigger: true});
 	},
 
 	saveModel: function() {
@@ -118,21 +101,38 @@ define([
 	    if( this.method === "create" )
 		this.model.attributes.id = undefined;
 	    this.model.save();
-	    this.navi2backward();
+	    Backbone.history.navigate(
+		(this.method == "create")? 
+		    this.route["next"] :
+		    this.route["next"] + this.moel.attributes.id);
 	},
 
 	destroyModel: function() {
 	    this.model.destroy();
-	    this.navi2backward();
+	    Backbone.history.navigate(this.route["next"]);
+	},
+
+	navi2cancel: function() {
+	    Backbone.history.navigate(
+		(this.method == "create")? 
+		    this.route["cancel"] :
+		    this.route["cancel"] + this.moel.attributes.id);
+	},
+
+	createAiLog: function() {
+	    Backbone.history.navigate(
+		this.route["logCreate"]+this.model.attributes.id,
+		{trigger: true}
+	    );
 	},
 
 	dataBinder: function(){
-	    // var id = this.model.attributes.id;
+	    var id = this.model.attributes.id;
 	    this.model.attributes = {
-		// id:        id,
+		id:        id,
 		ear_num:   this.$('#ear_num').val(),
 		name:      this.$('#name').val(),
-		sex:       (this.$('#sex-female').val()==="TURE")?"雌":"雄",
+		sex:       (this.$('#sex-female').val()==="on")?"雌":"雄",
 		birth:     this.$('#birth').val(),
 		owner_id:  this.$('#owner_id').val(),
 		parent:    this.$('#parent').val(),
@@ -189,11 +189,11 @@ define([
 	    };
 	},
 	
-	createAiLog: function() {
-	    Backbone.history.navigate(
-		"logC/"+this.model.attributes.id,
-		{trigger: true}
-	    );
+	setNumerics: function() {
+	    this.$('#ear_num').numeric({decimal: false,	negative: false});
+	    this.$('#owner_id').numeric({decimal: false,negative: false});
+	    this.$('#parent').numeric({decimal: false,	negative: false});
+	    this.$('#additional div input').numeric({decimal: false,negative: false});
 	},
 
 	remove: function(){

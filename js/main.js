@@ -21,17 +21,9 @@ require.config({
 });
 
 require(
-    [ 'backbone', 'views/kine', 'collection/kine', 'js/routers/router.js' ],
-    function(Backbone, KineView, KineCollection, KineRouter){
-	var kine_collection  = new KineCollection();
-	var myRouter = new KineRouter({collection: kine_collection});
-	myRouter.collection = kine_collection;
-
-	var app_view = new KineView({
-	    collection: kine_collection,
-	    router: myRouter
-	});
-	app_view.router = myRouter;
+    [ 'backbone', 'js/routers/router.js' ],
+    function(Backbone, KineRouter){
+	var myRouter = new KineRouter();
 	Backbone.history.start();
     }
 );

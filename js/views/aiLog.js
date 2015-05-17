@@ -8,7 +8,7 @@ define([
 ], function($, _, Backbone, ShowTemp, EditTemp, AiLog){
     var AiLogView = Backbone.View.extend({
 
-	el: '#root',
+	el: 'div',
 
 	templateS: _.template(ShowTemp),    // Show Static: to read, delete
 	templateE: _.template(EditTemp),    // Edit: to create, update
@@ -16,20 +16,14 @@ define([
 	events: {
 	    "click #create" : "createModel",
 	    "click #back"   : "backToCow",
-	    "click #toEdit"   : "naviToEdit",
+	    "click #toEdit"   : "naviToUpdate",
 	    "click #toDelete" : "naviToDelete",
 	    "click #update" : "updateModel",
 	    "click #destroy": "destroyModel",
+	    "click #calncel": "naviToCancel",
 	},
 
 	initialize: function() {
-	    this.method = this.model.method;
-	    if( this.method === "create")
-		this.render();
-	    else{
-		this.listenTo(this.model, 'sync', this.render);
-		this.model.fetch();
-	    }
 	},
 
 	render: function() {
@@ -46,12 +40,14 @@ define([
 		$('#buttons').append('<button id="toDelete">削除</button>');
 	    } else if(this.method === "update"){ // to delete
 		this.$el.html(this.templateE(this.model.attributes));
+		$('#buttons').append('<button id="cancel">取り消し</button>');
 		$('#buttons').append('<button id="update">記録</button>');
 	    } else if(this.method === "delete"){ // to delete
 		this.$el.html(this.templateS(this.model.attributes));
+		$('#buttons').append('<button id="cancel">取り消し</button>');
 		$('#buttons').append('<button id="destroy">削除</button>');
 	    }
-	    this.listenTo(this.model, 'sync', this.backToCow );
+	    // this.listenTo(this.model, 'sync', this.backToCow );
 	},
 
 	today: function() {
@@ -70,20 +66,25 @@ define([
 		state:  $('#state').val()
 	    });
 	    this.model.create(this.model.attributes);
+	    Backbone.history.navigate(this.route["next"]
+				      + this.model.attributes.cow_no);
 	},
 
 	backToCow: function(){
-	    Backbone.history.navigate("#"+this.model.attributes.cow_no,
+	    Backbone.history.navigate(this.route["back"]
+				      +this.model.attributes.cow_no,
+				      {trigger: true});
+	},
+
+	naviToUpdate: function(){
+	    Backbone.history.navigate(this.route["update"]
+				      +this.model.attributes.id,
 				      {trigger: true});
 	},
 
 	naviToDelete: function(){
-	    Backbone.history.navigate("#logD/"+this.model.attributes.id,
-				      {trigger: true});
-	},
-
-	naviToEdit: function(){
-	    Backbone.history.navigate("#logU/"+this.model.attributes.id,
+	    Backbone.history.navigate(this.route["delete"]
+				      +this.model.attributes.id,
 				      {trigger: true});
 	},
 
@@ -93,10 +94,20 @@ define([
 		state:  $('#state').val()
 	    });
 	    this.model.save();
+	    Backbone.history.navigate(this.route["next"]
+				      + this.model.attributes.cow_no);
 	},
 
 	destroyModel: function() {
 	    this.model.destroy();
+	    Backbone.history.navigate(this.route["next"]
+				      + this.model.attributes.cow_no);
+	},
+
+	naviToCalcal: function(){
+	    Backbone.history.navigate(this.route["cancel"]
+				      +this.model.attributes.id,
+				      {trigger: true});
 	},
     });
 
