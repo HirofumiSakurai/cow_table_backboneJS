@@ -1,0 +1,25 @@
+define([
+    'underscore', 
+    'backbone', 
+    'models/daughter'
+], function(_, Backbone, Daughter){
+    // Daughters は、Rails を通して Kine の daughters を一括してダウンロード
+    // するためのニセのコレクションです。daughters のようなデータは PostgreSQL
+    // で作ると非常に効率が良いため、このようなインプリメントにしてあります。
+
+    var DaughtersCollection = Backbone.Collection.extend({
+
+	model: Daughter,
+
+	url: "/rails/daughters.json?redirect=on&search_owner=",
+
+	fetch: function(options) {
+	    if( typeof options === "undefined" || options.owner_id === "" )
+		return;
+	    options.url =  this.url + options.owner_id;
+	    Backbone.Collection.prototype.fetch.call(this, options);
+	}
+    });
+
+    return DaughtersCollection;
+});

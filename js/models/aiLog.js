@@ -5,7 +5,8 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 	  id: '',
 	  cow_no: -1,
           date: '',
-          state: ''
+          state: '',
+	  owner_id: -1
       },
 
       root: "/rails/ai_logs/",
@@ -20,9 +21,21 @@ define(['underscore', 'backbone'], function(_, Backbone) {
       },
       
       save: function(options){
+	  if( this.attributes.id == "" )
+	      this.attributes.id = undefined;
 	  if( this.attributes.id )
 	      this.url = this.root + this.attributes.id;
 	  Backbone.Model.prototype.save.call(this, options);
+      },
+      
+      destroy: function(options){
+	  if( typeof this.attributes.id == "undefined"
+	      || this.attributes.id == "" ){
+	      console.log("aiLog.model.destory(): id is null!!");
+	      return;
+	  }
+	  this.url = this.root + this.attributes.id;
+	  Backbone.Model.prototype.destroy.call(this, options);
       },
       
       create: function(){

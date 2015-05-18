@@ -141,3 +141,7 @@ background-color: #fffdee;
 .tinp {
     width: 3ex;
 }
+
+#buttons button {
+    margin-left: 20px;
+}

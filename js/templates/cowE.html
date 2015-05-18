@@ -1,7 +1,7 @@
-<li><div id="button">
+<div id="button">
     <input type="button" value="保存" id="save"/>
     <input type="button" value="取り消し" id="cancel" />
-</div></li>
+</div>
 <ul id="cow-p-entity">
   <li>
     <div class="cow-p-tag">耳標番号:</div>
@@ -21,12 +21,11 @@
     <input type="date" class="cow-p-ent" value="<%- birth %>" id="birth" />
   </li>
   <li>
-    <div class="cow-p-tag">所有者ID:</div>
-    <input class="cow-p-ent" value="<%- owner_id %>" id="owner_id" />
-  </li>
-  <li>
     <div class="cow-p-tag">母親ID:</div>
     <input class="cow-p-ent" value="<%- parent %>" id="parent" />
+  </li>
+  <li>
+    <div class="cow-p-tag">所有者ID: <%- owner_id %> </div>
   </li>
 </ul><p />
 

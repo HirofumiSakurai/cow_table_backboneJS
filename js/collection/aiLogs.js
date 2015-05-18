@@ -10,6 +10,7 @@ define([
 	url: "/rails/ai_logs/",
 
 	fetch: function(options) {
+	    options = options || {owner_id: ""};
 	    options.url =  this.url + "?search_owner=" + options.owner_id
 	                            + "&redirect=sql";
 	    Backbone.Collection.prototype.fetch.call(this, options);

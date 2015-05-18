@@ -20,10 +20,11 @@ define([
 	    "click #toDelete" : "naviToDelete",
 	    "click #update" : "updateModel",
 	    "click #destroy": "destroyModel",
-	    "click #calncel": "naviToCancel",
+	    "click #cancel": "naviToCancel",
 	},
 
 	initialize: function() {
+	    // this.owner_id = this.model.attributes.owner_id;
 	},
 
 	render: function() {
@@ -44,10 +45,11 @@ define([
 		$('#buttons').append('<button id="update">記録</button>');
 	    } else if(this.method === "delete"){ // to delete
 		this.$el.html(this.templateS(this.model.attributes));
+		$('#buttons').append('[確認]このログを削除してよいですか？');
 		$('#buttons').append('<button id="cancel">取り消し</button>');
 		$('#buttons').append('<button id="destroy">削除</button>');
 	    }
-	    // this.listenTo(this.model, 'sync', this.backToCow );
+	    return this;
 	},
 
 	today: function() {
@@ -62,52 +64,51 @@ define([
 
 	createModel: function() {
 	    this.model.set({
+		id: undefined,
 		date: $('#date').val(),
-		state:  $('#state').val()
+		state:  $('#state').val(),
+		owner_id: this.owner_id
 	    });
-	    this.model.create(this.model.attributes);
-	    Backbone.history.navigate(this.route["next"]
-				      + this.model.attributes.cow_no);
+	    this.model.create();
+	    this.listenTo(this.model, "sync", function(){
+		this.logCollection.add(this.model);
+		this.navigate("next", this.model.attributes.cow_no);
+	    });
 	},
 
 	backToCow: function(){
-	    Backbone.history.navigate(this.route["back"]
-				      +this.model.attributes.cow_no,
-				      {trigger: true});
+	    this.navigate("back", this.model.attributes.cow_no);
 	},
 
 	naviToUpdate: function(){
-	    Backbone.history.navigate(this.route["update"]
-				      +this.model.attributes.id,
-				      {trigger: true});
+	    this.navigate("update", this.model.attributes.id);
 	},
 
 	naviToDelete: function(){
-	    Backbone.history.navigate(this.route["delete"]
-				      +this.model.attributes.id,
-				      {trigger: true});
+	    this.navigate("delete", this.model.attributes.id);
 	},
 
 	updateModel: function() {
 	    this.model.set({
 		date: $('#date').val(),
-		state:  $('#state').val()
+		state:  $('#state').val(),
+		owner_id: this.owner_id
 	    });
 	    this.model.save();
-	    Backbone.history.navigate(this.route["next"]
-				      + this.model.attributes.cow_no);
+	    this.listenTo(this.model, "sync", function(){
+		this.navigate("next", this.model.attributes.cow_no);
+	    });
 	},
 
 	destroyModel: function() {
 	    this.model.destroy();
-	    Backbone.history.navigate(this.route["next"]
-				      + this.model.attributes.cow_no);
+	    this.listenTo(this.model, "sync", function(){
+		this.navigate("next", this.model.attributes.cow_no);
+	    });
 	},
 
-	naviToCalcal: function(){
-	    Backbone.history.navigate(this.route["cancel"]
-				      +this.model.attributes.id,
-				      {trigger: true});
+	naviToCancel: function(){
+	    this.navigate("cancel", this.model.attributes.id);
 	},
     });
 

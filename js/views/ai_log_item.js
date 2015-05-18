@@ -12,28 +12,19 @@ define([
 
 	events: {
     	    "click .ai-log-item"  : "navi2aiLogRead",
-	    "click .delete-ai-log": "navi2aiLogDelete"
 	},
 
 	initialize: function() {
 	},
 
 	render: function() {
-	    this.$el.html(this.template(this.model));
+	    this.$el.html(this.template(this.model.attributes));
 	    return this;
 	},
 
 	navi2aiLogRead: function() {
-	    Backbone.history.navigate(
-		"logR/"+this.model.id,
-		{trigger: true, replace: true});
+	    this.navigate("logRead", this.model.id );
 	},
-
-	navi2aiLogDelete: function() {
-	    Backbone.history.navigate(
-		"logD/"+this.model.id,
-		{trigger: true, replace: true});
-	}
     });
     return CowNumberView;
 });

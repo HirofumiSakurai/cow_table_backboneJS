@@ -17,7 +17,8 @@ define([
 	view_list: [],
 	
 	events: {
-	    "keypress #owner_id" : "searchOnEnter",
+	    "keypress #owner_id"  : "searchOnEnter",
+	    "click    #createCow" : "naviToCreateCow"
 	},
 
 	initialize: function() {
@@ -49,7 +50,9 @@ define([
 			    model: cow,
 			}, this);
 			this.view_list.push(view);
+			view.router = this.router;
 			view.route = this.route;
+			view.navigate = this.navigate;
 			this.$('#cow-list').append(view.render().el);
 		    }
 		}, this);
@@ -61,7 +64,11 @@ define([
 	    this.last_input = this.input.val();
 	    this.$('#cow-list').html(
 		'<font color="skyblue">お待ちください。</font>');
-	    Backbone.history.navigate(this.route["next"], {trigger: true});
+	    this.navigate("next", "");
+	},
+
+	naviToCreateCow: function() {
+	    this.navigate("create");
 	},
 
 	remove: function(){

@@ -7,11 +7,13 @@ define([
     'views/aiLog',
     'collection/kine',
     'collection/aiLogs',
+    'collection/daughters',
     'models/cow',
-    'models/aiLog'
+    'models/aiLog',
+    'models/daughter'
 ], function($, _, Backbone,
 	    KineView, CowView, AiLogView,
-	    Kine, AiLogs, Cow, AiLogModel){
+	    Kine, AiLogs, Daughters, Cow, AiLogModel, Daughter){
       var KineRouter = Backbone.Router.extend({
 	  routes: {
 	      ""                           : "showLoginView",
@@ -21,7 +23,7 @@ define([
 	      "user/cowUpdate/:id"         : "updateCowView",
 	      "user/cowDelete/:id"         : "destroyCowView",
 	      "user/cow/logCreate/:cow_id" : "createLogView",
-	      "user/cow/logRread/:id"      : "readLogView",
+	      "user/cow/logRead/:id"      : "readLogView",
 	      "user/cow/logUpdate/:id"     : "updateLogView",
 	      "user/cow/logDelete/:id"     : "deleteLogView",
 	  },
@@ -35,14 +37,14 @@ define([
 		      "back":   "",
 		  },
 		  "user/cowCreate/": {
-		      "next": "user/cowRead/",
+		      "next": "user/",
 		      "cancel": "user/",
 		  },
 		  "user/cowRead/": {
-		      "back":      "user/",
+		      "back":      "<==",
 		      "update":    "user/cowUpdate/",
 		      "delete":    "user/cowDelete/",
-		      "LogCreate": "user/cow/logCreate/",
+		      "logCreate": "user/cow/logCreate/",
 		      "logRead":   "user/cow/logRead/",
 		  },
 		  "user/cowUpdate/": {
@@ -64,7 +66,7 @@ define([
 		  },
 		  "user/cow/logUpdate/": {
 		      next: "user/cowRead/",
-		      cancel: "user/cow/logRead",
+		      cancel: "user/cow/logRead/",
 		  },
 		  "user/cow/logDelete/": {
 		      next: "user/cowRead/",
@@ -74,11 +76,16 @@ define([
 	      return nr[(r === "")?"root": r];
 	  },
 
+	  initialize: function () {
+	      this.kineCollection = undefined;
+	      this.aiLogCollection = undefined;
+	  },
+
 	  prepare: function( action, path, options ){
 	      // call this func. on top of every action. 
 	      this.last_action = this.current_action;
 	      this.current_action = action;
-	      this.next_route = this.next_route_search(path);
+	      this.current_path = path;
 	      if(typeof options == "undefined" || ! options.manual){
 		  // turn off auto clear the last view;
 		  this.clearView();
@@ -99,7 +106,25 @@ define([
 		  console.log("error: you forgot to clear view manually!");
 	      }
 	      this.current_view = view;
-	      view.route = this.next_route;   // to be replace by navigate func.
+	      view.owner_id = this.owner_id;
+	      view.router = this;
+	      view.route = this.next_route_search(this.current_path);
+	      view.navigate = function(tag, opt ){
+		  opt = opt || "";
+		  var r = this.route[tag];
+		  if( typeof r == "undefined")
+		      console.log(
+			  "view.navigate : No route for the tag : "+tag);
+		  if( r === "<==" ){  // imply to history back.
+		      history.back();
+		  } else {
+		      this.router.navigate(this.route[tag]+opt,
+					   {trigger: true});
+		  }
+	      }
+	      view.kineCollection = this.kineCollection;
+	      view.logCollection = this.logCollection;
+	      view.daughtersCollection = this.daughtersCollection;
 //	      $('#main').html(view.render().el);
 	      $('#main').append(view.render().el);
 	  },
@@ -119,6 +144,8 @@ define([
 	      if( this.last_action === "login" ){
 		  this.owner_id = this.current_view.last_input;
 		  this.loadCollections(this.showKineViewCallBack);
+	      } else {
+		  this.showKineViewCallBack();
 	      }
 	  },
 
@@ -128,17 +155,16 @@ define([
 		      collection: this.kineCollection,
 		      id : this.owner_id,
 	      });
-	      view.aiLogCollection = this.aiLogCollection;
 	      this.postaction(view);
 	  },
 
-	  createCowView: function(owner_id){
+	  createCowView: function(){
 	      this.prepare("createCow", "user/cowCreate/");
 	      var cow = new Cow();
-	      model.owner_id = owner_id;
+	      cow.owner_id = this.owner_id;
 	      var view = new CowView({ model: cow });
 	      view.method = "create";
-	      view.id = owner_id; // for backward compatibility.
+	      view.id = this.owner_id; // for backward compatibility.
 	      this.postaction(view);
 	  },
 
@@ -148,11 +174,10 @@ define([
 		  id: parseInt(cow_id),
 	      });
 	      if( ! cow ){ // never happen, I hope.
-		  Backbone.history(this.next_route.back);
+		  this.navigate("", {triger: true});
 	      } else {
 		  var view = new CowView({ model: cow });
 		  view.method=  "read";
-		  view.logCollection = this.logCollection;
 		  this.postaction(view);
 	      }
 	  },
@@ -186,47 +211,51 @@ define([
 	  },
 
 	  createLogView: function(cow_id){
-	      this.prepare("createLog", "user/cow/logCreate");
+	      this.prepare("createLog", "user/cow/logCreate/");
 	      var aiLog = new AiLogModel();
 	      aiLog.set({cow_no: cow_id});
 	      var view = new AiLogView({model: aiLog});
 	      view.method = "create";
+	      view.owner_id = this.owner_id;
 	      this.postaction(view);
 	  },
 	  
 	  readLogView: function(id){
-	      this.prepare("readLog", "user/cow/logRead");
-	      var aiLog = this.logCollection.findWhere({id: parseInt(cow_id)});
+	      this.prepare("readLog", "user/cow/logRead/");
+	      var aiLog = this.logCollection.findWhere({id: parseInt(id)});
 	      if( ! aiLog ){ // never happen, unless you put id on address.
 		  Backbone.history(this.next_route.back);
 		  return;
 	      }
 	      var view = new AiLogView({model: aiLog});
 	      view.method = "read";
+	      view.owner_id = this.owner_id;
 	      this.postaction(view);
 	  },
 	  
 	  updateLogView: function(id){
-	      this.prepare("updateLog", "user/cow/logUpdate");
-	      var aiLog = this.logCollection.findWhere({id: parseInt(cow_id)});
+	      this.prepare("updateLog", "user/cow/logUpdate/");
+	      var aiLog = this.logCollection.findWhere({id: parseInt(id)});
 	      if( ! aiLog ){ // never happen, unless you put id on address.
 		  Backbone.history(this.next_route.back);
 		  return;
 	      }
 	      var view = new AiLogView({model: aiLog});
 	      view.method = "update";
+	      view.owner_id = this.owner_id;
 	      this.postaction(view);
 	  },
 
 	  deleteLogView: function(id){
-	      this.prepare("deleteLog", "user/cow/logDelete");
-	      var aiLog = this.logCollection.findWhere({id: parseInt(cow_id)});
+	      this.prepare("deleteLog", "user/cow/logDelete/");
+	      var aiLog = this.logCollection.findWhere({id: parseInt(id)});
 	      if( ! aiLog ){ // never happen, unless you put id on address.
 		  Backbone.history(this.next_route.back);
 		  return;
 	      }
 	      var view = new AiLogView({model: aiLog});
 	      view.method = "delete";
+	      view.owner_id = this.owner_id;
 	      this.postaction(view);
 	  },
 
@@ -243,11 +272,20 @@ define([
 	  
 	  loadCollectionsStep2: function(){
 	      this.logCollection = new AiLogs();
+	      this.logCollection.comparator = function(a, b) {
+		  return (a.get("date")  > b.get("date"))? -1: 1;
+	      };
 	      this.listenToOnce(this.logCollection, "sync",
-				this.loadCollectionsCallback);
+				this.loadCollectionsStep3);
 	      this.logCollection.fetch({owner_id: this.owner_id});
 	  },
 	  
+	  loadCollectionsStep3: function(){
+	      this.daughtersCollection = new Daughters();
+	      this.listenToOnce(this.daughtersCollection, "sync",
+				this.loadCollectionsCallback);
+	      this.daughtersCollection.fetch({owner_id: this.owner_id});
+	  },
       });
 
     return KineRouter;

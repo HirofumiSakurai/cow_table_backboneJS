@@ -22,7 +22,7 @@ define([
 
 	events: {
 	    "click #back"     : "navi2backward",    // Read
-	    "click #toupdate" : "navi2update",      // Read
+	    "click #toUpdate" : "navi2update",      // Read
 	    "click #toDestroy": "navi2destroy",     // Read
 	    "click #save"     : "saveModel",        // Cread, Update
 	    "click #destroy"  : "destroyModel",     // Delete
@@ -38,20 +38,30 @@ define([
 	    if( _.find(["read", "destroy"], function(e){
 		return this.method === e}, this)){
 		this.$el.append(this.template(this.model.attributes));
-		_.each(this.model.daughters, function(d){
-		    if(this.collection.get(d.attributes.id) )
-			$('#daughter-list').append(this.daughterTemplate(d));
-		    else
-			$('#daughter-list').append(d.ear_num);
-		}, this);
+		_.each(
+		    // this.model.attributes.daughters,
+		    this.daughtersCollection.findWhere({
+			id : this.model.attributes.id}).attributes.daughters,
+		    function(d){
+			if(this.kineCollection.get(d.id) )
+			    $('#daughter-list')
+			         .append(this.daughterTemplate(d));
+			else
+			    $('#daughter-list')
+			         .append('<li>'+ d.id + '</li>');
+		    }, this);
 		_.each(
 		    this.logCollection.where({
-		        cow_no: this.model.attributes.id }).models,
+		        cow_no: this.model.attributes.id }),
 		    function(a){
 			var view = new AiLogItem({
 			    model: a,
 			});
 			this.view_list.push(view);
+			view.router = this.router;
+			view.route = this.route;
+			view.owner_id = this.owner_id;
+			view.navigate = this.navigate;
 			this.$('#ai-log-list').append(view.render().el);
 		    }, this);
 		if(this.method === "destroy"){
@@ -66,8 +76,8 @@ define([
 		    this.$('#button').append(
 			'<input type="button" value="戻る" id="back" />');
 		}
-	    } else if( _.find(["create", "update"], function(e){
-		return this.method === e}, this)){
+	    } else if(this.method === "create" || this.method === "update"){
+		this.model.attributes.owner_id = this.owner_id;
 		this.$el.html(this.templateE(this.model.attributes));
 		this.setNumerics();
 	    }
@@ -75,25 +85,19 @@ define([
 	},
 
 	navi2backward: function() {
-	    Backbone.history.navigate(this.route["back"]);
+	    this.navigate("back", "");
 	},
 
 	navi2next: function() {
-	    Backbone.history.navigate(
-		this.route["next"]
-		    +this.model.attributes.id, {trigger: true});
+	    this.navigate("next", this.model.attributes.id);
 	},
 
 	navi2update: function() {
-	    Backbone.history.navigate(
-		this.route["update"]
-		    +this.model.attributes.id, {trigger: true});
+	    this.navigate("update", this.model.attributes.id);
 	},
 
 	navi2destory: function() {
-	    Backbone.history.navigate(
-		this.route["destroy"]
-		    +this.model.attributes.id, {trigger: true});
+	    this.navigate("destroy", this.model.attributes.id);
 	},
 
 	saveModel: function() {
@@ -101,29 +105,25 @@ define([
 	    if( this.method === "create" )
 		this.model.attributes.id = undefined;
 	    this.model.save();
-	    Backbone.history.navigate(
-		(this.method == "create")? 
-		    this.route["next"] :
-		    this.route["next"] + this.moel.attributes.id);
+	    this.navigate(
+		"next",
+		(this.method == "create")? "": this.model.attributes.id);
 	},
 
 	destroyModel: function() {
 	    this.model.destroy();
-	    Backbone.history.navigate(this.route["next"]);
+	    this.navigate("next", "");
 	},
 
 	navi2cancel: function() {
-	    Backbone.history.navigate(
+	    this.navigate(
+		"cancel",
 		(this.method == "create")? 
-		    this.route["cancel"] :
-		    this.route["cancel"] + this.moel.attributes.id);
+		    "" : this.model.attributes.id);
 	},
 
 	createAiLog: function() {
-	    Backbone.history.navigate(
-		this.route["logCreate"]+this.model.attributes.id,
-		{trigger: true}
-	    );
+	    this.navigate("logCreate", this.model.attributes.id);
 	},
 
 	dataBinder: function(){
