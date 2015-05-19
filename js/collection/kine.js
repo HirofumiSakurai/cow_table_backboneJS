@@ -7,7 +7,7 @@ define([
 
 	model: Cow,
 
-	url: "/rails/kine.json",
+	url: "/kine.json",
 
 	fetch: function(options) {
 	    options = options || {owner_id: ""};

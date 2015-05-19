@@ -6,7 +6,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 	  name:   '',
       },
 
-      root: "/rails/daughters/",
+      root: "/daughters/",
 
       initialize: function() {
 	  this.url = this.root;

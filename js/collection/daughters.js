@@ -11,7 +11,7 @@ define([
 
 	model: Daughter,
 
-	url: "/rails/daughters.json?redirect=on&search_owner=",
+	url: "/daughters.json?redirect=on&search_owner=",
 
 	fetch: function(options) {
 	    if( typeof options === "undefined" || options.owner_id === "" )
