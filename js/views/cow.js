@@ -23,9 +23,10 @@ define([
 	events: {
 	    "click #back"     : "navi2backward",    // Read
 	    "click #toUpdate" : "navi2update",      // Read
-	    "click #toDestroy": "navi2destroy",     // Read
+	    "click #toDelete" : "navi2delete",     // Read
+	    "click #toCowList": "navi2CowList",     // Read
 	    "click #save"     : "saveModel",        // Cread, Update
-	    "click #destroy"  : "destroyModel",     // Delete
+	    "click #delete"   : "deleteModel",     // Delete
 	    "click #cancel"   : "navi2cancel",      // Cread, Update, Delete
 	    "click #create-ai-log": "createAiLog"   
 	},
@@ -35,20 +36,21 @@ define([
 
 	render: function() {
 	    this.view_list = [];
-	    if( _.find(["read", "destroy"], function(e){
+	    if( _.find(["read", "delete"], function(e){
 		return this.method === e}, this)){
 		this.$el.append(this.template(this.model.attributes));
-		_.each(
-		    // this.model.attributes.daughters,
-		    this.daughtersCollection.findWhere({
-			id : this.model.attributes.id}).attributes.daughters,
+		var daughters = this.daughtersCollection.findWhere({
+		    id : this.model.attributes.id});
+		daughters = (daughters)? daughters.attributes.daughters : [];
+		daughters = _.sortBy(daughters, function(d){return d.ear_num;})
+		_.each( daughters,
 		    function(d){
 			if(this.kineCollection.get(d.id) )
 			    $('#daughter-list')
 			         .append(this.daughterTemplate(d));
 			else
 			    $('#daughter-list')
-			         .append('<li>'+ d.id + '</li>');
+			         .append('<li>'+ d.ear_num + '</li>');
 		    }, this);
 		_.each(
 		    this.logCollection.where({
@@ -64,17 +66,21 @@ define([
 			view.navigate = this.navigate;
 			this.$('#ai-log-list').append(view.render().el);
 		    }, this);
-		if(this.method === "destroy"){
+		if(this.method === "delete"){
 		    this.$('#button').append(
-			'<input type="button" value="取り消し" id="cancel" />'
-		       +'<input type="button" value="削除" id="destroy" />');
+			'[確認]本当に削除してもよいですか？'
+		       +'<input type="button" value="取り消し" id="cancel" />'
+		       +'<input type="button" value="削除" id="delete" />');
 		} else if(this.method === "read"){
 		    this.$('#button').append(
 			'<input type="button" value="削除" id="toDelete" />');
 		    this.$('#button').append(
 			'<input type="button" value="変更" id="toUpdate" />');
+		    if( this.enableBackButton )
+			this.$('#button').append(
+			    '<input type="button" value="戻る" id="back" />');
 		    this.$('#button').append(
-			'<input type="button" value="戻る" id="back" />');
+			'<input type="button" value="牛リストへ" id="toCowList" />');
 		}
 	    } else if(this.method === "create" || this.method === "update"){
 		this.model.attributes.owner_id = this.owner_id;
@@ -96,22 +102,34 @@ define([
 	    this.navigate("update", this.model.attributes.id);
 	},
 
-	navi2destory: function() {
-	    this.navigate("destroy", this.model.attributes.id);
+	navi2delete: function() {
+	    this.navigate("delete", this.model.attributes.id);
+	},
+
+	navi2CowList: function() {
+	    this.navigate("cowList");
 	},
 
 	saveModel: function() {
 	    this.dataBinder();
-	    if( this.method === "create" )
-		this.model.attributes.id = undefined;
-	    this.model.save();
+	    if( this.method === "create" ){
+		this.model.attributes.id = undefined; // to save
+		this.listenTo(this.kineCollection, 'sync', this.saveModelStep2);
+		this.kineCollection.create( this.model );
+	    } else {
+		this.listenTo(this.model, 'sync', this.saveModelStep2);
+		this.model.save();
+	    }
+	},
+
+	saveModelStep2: function() {
 	    this.navigate(
 		"next",
 		(this.method == "create")? "": this.model.attributes.id);
 	},
 
-	destroyModel: function() {
-	    this.model.destroy();
+	deleteModel: function() {
+	    this.model.destroy();    // it is not delete, destroy!
 	    this.navigate("next", "");
 	},
 
@@ -134,7 +152,8 @@ define([
 		name:      this.$('#name').val(),
 		sex:       (this.$('#sex-female').val()==="on")?"雌":"雄",
 		birth:     this.$('#birth').val(),
-		owner_id:  this.$('#owner_id').val(),
+		// owner_id:  this.$('#owner_id').val(),
+		owner_id:  this.owner_id,
 		parent:    this.$('#parent').val(),
 		t1: this.$('#t1').val(),
 		t2: this.$('#t2').val(),

@@ -1,0 +1,31 @@
+define(['underscore', 'backbone'], function(_, Backbone) {
+  var AiLogModel = Backbone.Model.extend({
+
+      defaults: {
+	  id: '',
+	  cow_no: -1,
+          date: '',
+          state: ''
+      },
+
+      url: "/rails/ai_logs/",
+
+      initialize: function() {
+	  this.url += this.id;
+      },
+
+      saveWithCSRF: function(attr, options){
+
+          // でなくて、サーバに送らせたページ
+	  // var token = $('meta[name="csrf-token"]').attr('content');
+	  // var toekn2 =  $.cookie('token');
+	  // Backbone.Model.prototype.toJSON = function() {
+	  //     return _(_.clone(this.attributes)).extend({
+	  // 	  authenticity_token: token
+	  //     });
+	  // };
+	  this.save( attr, options );
+      }
+  });
+  return AiLogModel;
+});

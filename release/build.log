@@ -1,0 +1,20 @@
+> npm install amdclean --save-dev
+> export NODE_PATH=./node_modules/
+> cp main.js.org main.js
+> nodejs ./libs/r.js -o build.js 
+> java -jar ./libs/compiler.jar --js ../release/main.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ./main.js --externs libs/jquery.js --externs libs/underscore.js --externs libs/backbone.js --externs libs/require.js --jscomp_off=externsValidation
+
+closure compiler で大量のエラーがでる。大半は、クロージャの最後の要素の後にカンマが
+ついていると、IE8以前でエラーになるよっていうエラー。
+リリース前には手で修正するかなにかしたほうがいい。
+とりあえず、コンパイルスイッチで逃げるのも良し。
+ --language_in ECMASCRIPT5_STRICT みないに。
+
+ADVANCED だとうまく動かなかった。
+-rw-rw-r--   1 hirofumi       hirofumi   150272 2015-05-19 09:19 main.js
+-rw-rw-r--   1 hirofumi       hirofumi   155386 2015-05-19 09:19 main.js
+
+5k程度しか変わらないし、とりあえず SIMPLE で我慢。
+ちなみにコンパイル前は
+-rw-rw-r--   1 hirofumi       hirofumi   423119 2015-05-19 09:13 ../release/main.js
+

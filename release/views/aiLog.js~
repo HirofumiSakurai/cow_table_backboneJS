@@ -1,0 +1,66 @@
+define([
+    'jquery', 
+    'underscore', 
+    'backbone',
+    'text!templates/aiLog.html',
+    'models/aiLog'
+], function($, _, Backbone, logTemp, aiLog){
+    var AiLogView = Backbone.View.extend({
+
+	el: 'body',
+
+	template: _.template(logTemp),
+
+	events: {
+	    "click #create" : "createModel",
+	    "click #update" : "updateModel",
+	    "click #destroy": "destroyModel"
+	},
+
+	initialize: function() {
+	    this.model = new aiLog({id: this.id});
+	    if( typeof this.id === "undefined" ){ // to create
+		this.listenTo(this.model, 'sync', this.create);
+		this.model.cow_no = this.cow_no;
+	    } else { // to update
+		this.listenTo(this.model, 'sync', this.update);
+		this.model.fetch();
+	    }
+	},
+
+	render: function() {
+	    this.$el.html(this.template(this.model.attributes));
+	},
+
+	create: function() {
+	    // this.model.attributes = this.model.attributes[0];
+	    this.render();
+	    $('#buttons').append('<button id="create">記録</button>');
+	},
+
+	update: function() {
+	    // this.model.attributes = this.model.attributes[0];
+	    this.render();
+	    $('#buttons').append('<button id="update">更新</button>');
+	    $('#buttons').append('<button id="destroy">削除</button>');
+	},
+
+	createModel: function() {
+	},
+
+	updateModel: function() {
+	    this.model.set({
+		date: $('#date').val(),
+		state:  $('#state').val()
+	    });
+	    // this.model.saveById(this.id);
+	    // this.model.saveWithCSRF( this.model.attributes );
+	    this.model.save();
+	},
+
+	destroyModel: function() {
+	},
+    });
+
+    return AiLogView;
+});

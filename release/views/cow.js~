@@ -1,0 +1,35 @@
+define([
+    'jquery', 
+    'underscore', 
+    'backbone',
+    'text!templates/cow.html'
+], function($, _, Backbone, cowTemplate){
+    var CowView = Backbone.View.extend({
+
+	el: 'body',
+
+	template: _.template(cowTemplate),
+
+	events: {
+	    "click #update" : "updateModel",
+	    "click #destroy": "destroyModel"
+	},
+
+	initialize: function() {
+	    this.listenTo(this.collection, 'all', this.render);
+	},
+
+	render: function() {
+	    this.$el.html(this.template(this.model));
+	    return this;
+	},
+
+	updateModel: funtion(){
+	},
+
+	destroyModel: function(){
+	}
+    });
+
+    return new CowView;
+}

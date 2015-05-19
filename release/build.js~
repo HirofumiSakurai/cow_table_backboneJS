@@ -1,0 +1,40 @@
+({
+    appDir: "./",
+    baseUrl: "./",
+    dir: "../release",
+    paths: {
+        'backbone':         'libs/backbone/backbone',
+        'underscore':       'libs/underscore/underscore',
+        'jquery':           'libs/jquery/jquery',
+	'text':             'libs/require/text',
+	'storage':          'libs/backbone/backbone.localStorage'
+    },
+    // optimize: "closure",
+    optimize: "none",
+    closure: {
+	CompilerOptions: {},
+	// CompilationLevel: 'SIMPLE_OPTIMIZATIONS',
+	CompilationLevel: 'ADVANCED_OPTIMIZATIONS',
+	loggingLevel: 'WARNING'
+    },
+
+    onModuleBundleComplete: function (data) {
+    	var fs = module.require('fs'),
+    	    amdclean = module.require('amdclean'),
+    	    outputFile = data.path,
+    	    cleanedCode = amdclean.clean({
+    		'filePath': outputFile
+    	    });
+
+    	fs.writeFileSync(outputFile, cleanedCode);
+    },
+
+    modules: [
+        {
+            name: "main",
+            exclude: [
+                // If you prefer not to include certain libs exclude them here
+            ]
+        }
+    ]
+})
