@@ -40,7 +40,8 @@ define([
 		return this.method === e}, this)){
 		this.$el.append(this.template(this.model.attributes));
 		var daughters = this.daughtersCollection.findWhere({
-		    id : this.model.attributes.id}).attributes.daughters;
+		    id : this.model.attributes.id});
+		daughters = (daughters)? daughters.attributes.daughters : [];
 		daughters = _.sortBy(daughters, function(d){return d.ear_num;})
 		_.each( daughters,
 		    function(d){
@@ -113,8 +114,15 @@ define([
 	    this.dataBinder();
 	    if( this.method === "create" ){
 		this.model.attributes.id = undefined; // to save
+		this.listenTo(this.kineCollection, 'sync', this.saveModelStep2);
+		this.kineCollection.create( this.model );
+	    } else {
+		this.listenTo(this.model, 'sync', this.saveModelStep2);
+		this.model.save();
 	    }
-	    this.model.save();
+	},
+
+	saveModelStep2: function() {
 	    this.navigate(
 		"next",
 		(this.method == "create")? "": this.model.attributes.id);

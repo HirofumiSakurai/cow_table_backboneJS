@@ -13257,7 +13257,7 @@ define('models/cow',['underscore', 'backbone'], function(_, Backbone) {
 	  t50:'', created_at:'',updated_at:''
       },
 
-      root: "/rails/kine/",
+      root: "/kine/",
 
       initialize: function() {
 	  this.url = this.root;
@@ -13309,7 +13309,7 @@ define('models/aiLog',['underscore', 'backbone'], function(_, Backbone) {
 	  owner_id: -1
       },
 
-      root: "/rails/ai_logs/",
+      root: "/ai_logs/",
 
       initialize: function() {
 	  this.url = this.root;
@@ -13546,7 +13546,8 @@ define('views/cow',[
 		return this.method === e}, this)){
 		this.$el.append(this.template(this.model.attributes));
 		var daughters = this.daughtersCollection.findWhere({
-		    id : this.model.attributes.id}).attributes.daughters;
+		    id : this.model.attributes.id});
+		daughters = (daughters)? daughters.attributes.daughters : [];
 		daughters = _.sortBy(daughters, function(d){return d.ear_num;})
 		_.each( daughters,
 		    function(d){
@@ -13619,8 +13620,15 @@ define('views/cow',[
 	    this.dataBinder();
 	    if( this.method === "create" ){
 		this.model.attributes.id = undefined; // to save
+		this.listenTo(this.kineCollection, 'sync', this.saveModelStep2);
+		this.kineCollection.create( this.model );
+	    } else {
+		this.listenTo(this.model, 'sync', this.saveModelStep2);
+		this.model.save();
 	    }
-	    this.model.save();
+	},
+
+	saveModelStep2: function() {
 	    this.navigate(
 		"next",
 		(this.method == "create")? "": this.model.attributes.id);
@@ -13731,7 +13739,7 @@ define('collection/kine',[
 
 	model: Cow,
 
-	url: "/rails/kine.json",
+	url: "/kine.json",
 
 	fetch: function(options) {
 	    options = options || {owner_id: ""};
@@ -13753,7 +13761,7 @@ define('collection/aiLogs',[
 	
 	model: aiLog,
 
-	url: "/rails/ai_logs/",
+	url: "/ai_logs/",
 
 	fetch: function(options) {
 	    options = options || {owner_id: ""};
@@ -13774,7 +13782,7 @@ define('models/daughter',['underscore', 'backbone'], function(_, Backbone) {
 	  name:   '',
       },
 
-      root: "/rails/daughters/",
+      root: "/daughters/",
 
       initialize: function() {
 	  this.url = this.root;
@@ -13802,7 +13810,7 @@ define('collection/daughters',[
 
 	model: Daughter,
 
-	url: "/rails/daughters.json?redirect=on&search_owner=",
+	url: "/daughters.json?redirect=on&search_owner=",
 
 	fetch: function(options) {
 	    if( typeof options === "undefined" || options.owner_id === "" )

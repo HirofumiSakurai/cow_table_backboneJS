@@ -9,7 +9,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 	  owner_id: -1
       },
 
-      root: "/rails/ai_logs/",
+      root: "/ai_logs/",
 
       initialize: function() {
 	  this.url = this.root;

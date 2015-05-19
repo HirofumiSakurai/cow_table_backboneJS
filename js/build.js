@@ -3,10 +3,10 @@
     baseUrl: "./",
     dir: "../release",
     paths: {
+        'backbone':         'libs/backbone',
+        'underscore':       'libs/underscore',
         'jquery':           'libs/jquery',
 	'jqueryNumeric':    'libs/jquery.numeric',
-        'underscore':       'libs/underscore',
-        'backbone':         'libs/backbone',
 	'text':             'libs/text',
     },
     optimize: "none",
@@ -14,9 +14,9 @@
     onModuleBundleComplete: function (data) {
     	var fs = module.require('fs'),
     	    amdclean = module.require('amdclean'),
-    	    outputFile = data.path,
+    	    outputFile = '../release/main.js.cleaned', // data.path,
     	    cleanedCode = amdclean.clean({
-    		'filePath': outputFile
+    		'filePath': '../release/main.js'
     	    });
 
     	fs.writeFileSync(outputFile, cleanedCode);

@@ -7,7 +7,7 @@ define([
 	
 	model: aiLog,
 
-	url: "/rails/ai_logs/",
+	url: "/ai_logs/",
 
 	fetch: function(options) {
 	    options = options || {owner_id: ""};

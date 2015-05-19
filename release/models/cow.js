@@ -17,7 +17,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 	  t50:'', created_at:'',updated_at:''
       },
 
-      root: "/rails/kine/",
+      root: "/kine/",
 
       initialize: function() {
 	  this.url = this.root;
