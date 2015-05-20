@@ -13855,8 +13855,8 @@ define('routers/router',[
 	    Kine, AiLogs, Daughters, Cow, AiLogModel, Daughter){
       var KineRouter = Backbone.Router.extend({
 
-	  server: 'http://cowtablerails-cacmykpdqd.elasticbeanstalk.com',
-	  // server: '',
+	  // server: 'http://cowtablerails-cacmykpdqd.elasticbeanstalk.com',
+	  server: '',
 
 	  routes: {
 	      ""                           : "showLoginView",
