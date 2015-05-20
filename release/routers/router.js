@@ -293,7 +293,7 @@ define([
 	  
 	  loadCollectionsStep3: function(){
 	      this.daughtersCollection = new Daughters();
-	      this.daughterCollection.server = this.server;
+	      this.daughtersCollection.server = this.server;
 	      this.listenToOnce(this.daughtersCollection, "sync",
 				this.loadCollectionsCallback);
 	      this.daughtersCollection.fetch({owner_id: this.owner_id});
