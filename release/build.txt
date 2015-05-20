@@ -4,6 +4,7 @@ main.js
 libs/underscore.js
 libs/jquery.js
 libs/backbone.js
+global.js
 libs/text.js
 text!templates/cow_number.html
 views/cow_number.js

@@ -1,4 +1,4 @@
-define(['underscore', 'backbone'], function(_, Backbone) {
+define(['global', 'underscore', 'backbone'], function(global, _, Backbone) {
   var DaughterModel = Backbone.Model.extend({
 
       defaults: {
@@ -9,7 +9,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
       root: "/daughters/",
 
       initialize: function() {
-	  this.url = this.root;
+	  this.url = global.server + this.root;
       },
 
       fetch: function(options){

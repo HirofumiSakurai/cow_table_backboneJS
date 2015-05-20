@@ -1,4 +1,4 @@
-define(['underscore', 'backbone'], function(_, Backbone) {
+define(['global', 'underscore', 'backbone'], function(global, _, Backbone) {
   var CowModel = Backbone.Model.extend({
 
       defaults: {
@@ -20,7 +20,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
       root: "/kine/",
 
       initialize: function() {
-	  this.url = this.root;
+	  this.url = global.server + this.root;
       },
 
       fetchById: function(options) {

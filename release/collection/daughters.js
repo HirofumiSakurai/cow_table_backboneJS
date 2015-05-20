@@ -14,9 +14,10 @@ define([
 	url: "/daughters.json?redirect=on&search_owner=",
 
 	fetch: function(options) {
+	    var server = this.server || "";
 	    if( typeof options === "undefined" || options.owner_id === "" )
 		return;
-	    options.url =  this.url + options.owner_id;
+	    options.url =  server + this.url + options.owner_id;
 	    Backbone.Collection.prototype.fetch.call(this, options);
 	}
     });

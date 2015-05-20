@@ -1,4 +1,5 @@
 define([
+    'global',
     'jquery', 
     'underscore', 
     'backbone',
@@ -11,10 +12,13 @@ define([
     'models/cow',
     'models/aiLog',
     'models/daughter'
-], function($, _, Backbone,
+], function(global, $, _, Backbone,
 	    KineView, CowView, AiLogView,
 	    Kine, AiLogs, Daughters, Cow, AiLogModel, Daughter){
       var KineRouter = Backbone.Router.extend({
+
+	  server: 'http://cowtablerails-cacmykpdqd.elasticbeanstalk.com',
+
 	  routes: {
 	      ""                           : "showLoginView",
 	      "user/"                      : "showKineView",
@@ -80,6 +84,7 @@ define([
 	  initialize: function () {
 	      this.kineCollection = undefined;
 	      this.aiLogCollection = undefined;
+	      global.server = this.server;
 	  },
 
 	  prepare: function( action, path, options ){
@@ -268,6 +273,7 @@ define([
 	      this.kineCollection.comparator = function(model) {
 		  return model.get("ear_num");
 	      };
+	      this.kineCollection.server = this.server;
 	      this.listenToOnce(this.kineCollection, "sync",
 				this.loadCollectionsStep2);
 	      this.loadCollectionsCallback = callback;
@@ -279,6 +285,7 @@ define([
 	      this.logCollection.comparator = function(a, b) {
 		  return (a.get("date")  > b.get("date"))? -1: 1;
 	      };
+	      this.logCollection.server = this.server;
 	      this.listenToOnce(this.logCollection, "sync",
 				this.loadCollectionsStep3);
 	      this.logCollection.fetch({owner_id: this.owner_id});
@@ -286,6 +293,7 @@ define([
 	  
 	  loadCollectionsStep3: function(){
 	      this.daughtersCollection = new Daughters();
+	      this.daughterCollection.server = this.server;
 	      this.listenToOnce(this.daughtersCollection, "sync",
 				this.loadCollectionsCallback);
 	      this.daughtersCollection.fetch({owner_id: this.owner_id});

@@ -18,3 +18,4 @@ ADVANCED だとうまく動かなかった。
 ちなみにコンパイル前は
 -rw-rw-r--   1 hirofumi       hirofumi   423119 2015-05-19 09:13 ../release/main.js
 
+release/main.js.cleaned から require.config を手で消さないと、ちょっと無駄かも。

@@ -12367,6 +12367,14 @@ return jQuery;
 
 }));
 
+var global_object_please_dont_use_this_name = {
+    server: ""  // set in router.js, used in models.
+};
+
+define('global',[], function() {
+    return global_object_please_dont_use_this_name;
+});
+
 /**
  * @license RequireJS text 2.0.12 Copyright (c) 2010-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
@@ -13238,7 +13246,7 @@ define('text!templates/cowE.html',[],function () { return '<div id="button">\n  
 
 define('text!templates/daughter.html',[],function () { return '<li><a href="#user/cowRead/<%- id %>"> <%- ear_num %></a> </li>\n';});
 
-define('models/cow',['underscore', 'backbone'], function(_, Backbone) {
+define('models/cow',['global', 'underscore', 'backbone'], function(global, _, Backbone) {
   var CowModel = Backbone.Model.extend({
 
       defaults: {
@@ -13260,7 +13268,7 @@ define('models/cow',['underscore', 'backbone'], function(_, Backbone) {
       root: "/kine/",
 
       initialize: function() {
-	  this.url = this.root;
+	  this.url = global.server + this.root;
       },
 
       fetchById: function(options) {
@@ -13298,7 +13306,7 @@ define('models/cow',['underscore', 'backbone'], function(_, Backbone) {
   return CowModel;
 });
 
-define('models/aiLog',['underscore', 'backbone'], function(_, Backbone) {
+define('models/aiLog',['global', 'underscore', 'backbone'], function(global, _, Backbone) {
   var AiLogModel = Backbone.Model.extend({
 
       defaults: {
@@ -13312,7 +13320,7 @@ define('models/aiLog',['underscore', 'backbone'], function(_, Backbone) {
       root: "/ai_logs/",
 
       initialize: function() {
-	  this.url = this.root;
+	  this.url = global.server + this.root;
       },
 
       fetch: function(options){
@@ -13742,8 +13750,10 @@ define('collection/kine',[
 	url: "/kine.json",
 
 	fetch: function(options) {
+	    var server = this.server || "";
 	    options = options || {owner_id: ""};
-	    options.url =  this.url + "?search_owner=" + options.owner_id
+	    options.url =  server + this.url
+		                    + "?search_owner=" + options.owner_id
 		                    + "&redirect=sql";
 	    Backbone.Collection.prototype.fetch.call(this, options);
 	}
@@ -13764,8 +13774,10 @@ define('collection/aiLogs',[
 	url: "/ai_logs/",
 
 	fetch: function(options) {
+	    var server = this.server || "";
 	    options = options || {owner_id: ""};
-	    options.url =  this.url + "?search_owner=" + options.owner_id
+	    options.url =  server + this.url
+	                            + "?search_owner=" + options.owner_id
 	                            + "&redirect=sql";
 	    Backbone.Collection.prototype.fetch.call(this, options);
 	},
@@ -13774,7 +13786,7 @@ define('collection/aiLogs',[
     return AiLogsCollection;
 });
 
-define('models/daughter',['underscore', 'backbone'], function(_, Backbone) {
+define('models/daughter',['global', 'underscore', 'backbone'], function(global, _, Backbone) {
   var DaughterModel = Backbone.Model.extend({
 
       defaults: {
@@ -13785,7 +13797,7 @@ define('models/daughter',['underscore', 'backbone'], function(_, Backbone) {
       root: "/daughters/",
 
       initialize: function() {
-	  this.url = this.root;
+	  this.url = global.server + this.root;
       },
 
       fetch: function(options){
@@ -13813,9 +13825,10 @@ define('collection/daughters',[
 	url: "/daughters.json?redirect=on&search_owner=",
 
 	fetch: function(options) {
+	    var server = this.server || "";
 	    if( typeof options === "undefined" || options.owner_id === "" )
 		return;
-	    options.url =  this.url + options.owner_id;
+	    options.url =  server + this.url + options.owner_id;
 	    Backbone.Collection.prototype.fetch.call(this, options);
 	}
     });
@@ -13824,6 +13837,7 @@ define('collection/daughters',[
 });
 
 define('routers/router',[
+    'global',
     'jquery', 
     'underscore', 
     'backbone',
@@ -13836,10 +13850,13 @@ define('routers/router',[
     'models/cow',
     'models/aiLog',
     'models/daughter'
-], function($, _, Backbone,
+], function(global, $, _, Backbone,
 	    KineView, CowView, AiLogView,
 	    Kine, AiLogs, Daughters, Cow, AiLogModel, Daughter){
       var KineRouter = Backbone.Router.extend({
+
+	  server: 'http://cowtablerails-cacmykpdqd.elasticbeanstalk.com',
+
 	  routes: {
 	      ""                           : "showLoginView",
 	      "user/"                      : "showKineView",
@@ -13905,6 +13922,7 @@ define('routers/router',[
 	  initialize: function () {
 	      this.kineCollection = undefined;
 	      this.aiLogCollection = undefined;
+	      global.server = this.server;
 	  },
 
 	  prepare: function( action, path, options ){
@@ -14093,6 +14111,7 @@ define('routers/router',[
 	      this.kineCollection.comparator = function(model) {
 		  return model.get("ear_num");
 	      };
+	      this.kineCollection.server = this.server;
 	      this.listenToOnce(this.kineCollection, "sync",
 				this.loadCollectionsStep2);
 	      this.loadCollectionsCallback = callback;
@@ -14104,6 +14123,7 @@ define('routers/router',[
 	      this.logCollection.comparator = function(a, b) {
 		  return (a.get("date")  > b.get("date"))? -1: 1;
 	      };
+	      this.logCollection.server = this.server;
 	      this.listenToOnce(this.logCollection, "sync",
 				this.loadCollectionsStep3);
 	      this.logCollection.fetch({owner_id: this.owner_id});
@@ -14111,6 +14131,7 @@ define('routers/router',[
 	  
 	  loadCollectionsStep3: function(){
 	      this.daughtersCollection = new Daughters();
+	      this.daughterCollection.server = this.server;
 	      this.listenToOnce(this.daughtersCollection, "sync",
 				this.loadCollectionsCallback);
 	      this.daughtersCollection.fetch({owner_id: this.owner_id});

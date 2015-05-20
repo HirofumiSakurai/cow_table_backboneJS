@@ -1,4 +1,4 @@
-define(['underscore', 'backbone'], function(_, Backbone) {
+define(['global', 'underscore', 'backbone'], function(global, _, Backbone) {
   var AiLogModel = Backbone.Model.extend({
 
       defaults: {
@@ -12,7 +12,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
       root: "/ai_logs/",
 
       initialize: function() {
-	  this.url = this.root;
+	  this.url = global.server + this.root;
       },
 
       fetch: function(options){
