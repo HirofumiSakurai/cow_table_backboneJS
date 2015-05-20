@@ -43,7 +43,7 @@ define([
 	    this.$('#cow-list').html('');
 	    this.view_list = [];
 	    _.each(
-		this.collection.models, 
+		this.kineCollection.models, 
 		function(cow){
 		    if( cow ){
 			var view = new CowNumberView({

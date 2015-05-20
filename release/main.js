@@ -13200,7 +13200,7 @@ define('views/kine',[
 	    this.$('#cow-list').html('');
 	    this.view_list = [];
 	    _.each(
-		this.collection.models, 
+		this.kineCollection.models, 
 		function(cow){
 		    if( cow ){
 			var view = new CowNumberView({
@@ -13856,6 +13856,7 @@ define('routers/router',[
       var KineRouter = Backbone.Router.extend({
 
 	  server: 'http://cowtablerails-cacmykpdqd.elasticbeanstalk.com',
+	  // server: '',
 
 	  routes: {
 	      ""                           : "showLoginView",

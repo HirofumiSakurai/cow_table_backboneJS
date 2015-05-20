@@ -18,6 +18,7 @@ define([
       var KineRouter = Backbone.Router.extend({
 
 	  server: 'http://cowtablerails-cacmykpdqd.elasticbeanstalk.com',
+	  // server: '',
 
 	  routes: {
 	      ""                           : "showLoginView",
