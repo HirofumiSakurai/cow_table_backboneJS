@@ -1,7 +1,7 @@
 define([
     'global',
-    'jquery', 
-    'underscore', 
+    'jquery',
+    'underscore',
     'backbone',
     'views/kine',
     'views/cow',
@@ -89,7 +89,7 @@ define([
 	  },
 
 	  prepare: function( action, path, options ){
-	      // call this func. on top of every action. 
+	      // call this func. on top of every action.
 	      this.last_action = this.current_action;
 	      this.current_action = action;
 	      this.current_path = path;
@@ -134,6 +134,10 @@ define([
 	      view.daughtersCollection = this.daughtersCollection;
 //	      $('#main').html(view.render().el);
 	      $('#main').append(view.render().el);
+        if(typeof this.callback_function === "function"){
+          this.callback_function();
+        }           // this is just for jasmine Spec test.
+        this.callback_function = undefined;
 	  },
 
 	  showLoginView: function() {
@@ -149,8 +153,8 @@ define([
 	  showKineView: function() {
 	      this.prepare("kine", "user/", {manual: true});
 	      if( this.last_action === "login" ){
-		  this.owner_id = this.current_view.last_input;
-		  this.loadCollections(this.showKineViewCallBack);
+		        this.owner_id = this.current_view.last_input;
+		        this.loadCollections(this.showKineViewCallBack);
 	      } else {
 		  this.showKineViewCallBack();
 	      }
@@ -229,7 +233,7 @@ define([
 	      view.owner_id = this.owner_id;
 	      this.postaction(view);
 	  },
-	  
+
 	  readLogView: function(id){
 	      this.prepare("readLog", "user/cow/logRead/");
 	      var aiLog = this.logCollection.findWhere({id: parseInt(id)});
@@ -242,7 +246,7 @@ define([
 	      view.owner_id = this.owner_id;
 	      this.postaction(view);
 	  },
-	  
+
 	  updateLogView: function(id){
 	      this.prepare("updateLog", "user/cow/logUpdate/");
 	      var aiLog = this.logCollection.findWhere({id: parseInt(id)});
@@ -280,7 +284,7 @@ define([
 	      this.loadCollectionsCallback = callback;
 	      this.kineCollection.fetch({owner_id: this.owner_id});
 	  },
-	  
+
 	  loadCollectionsStep2: function(){
 	      this.logCollection = new AiLogs();
 	      this.logCollection.comparator = function(a, b) {
@@ -291,7 +295,7 @@ define([
 				this.loadCollectionsStep3);
 	      this.logCollection.fetch({owner_id: this.owner_id});
 	  },
-	  
+
 	  loadCollectionsStep3: function(){
 	      this.daughtersCollection = new Daughters();
 	      this.daughtersCollection.server = this.server;
@@ -303,4 +307,3 @@ define([
 
     return KineRouter;
 });
-	 

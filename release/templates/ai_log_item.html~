@@ -1,1 +1,0 @@
-<div> <div class="ai-log-item"><%- date %>:<%- state %></div><input type="button" class="delete-ai-log" value="削除" /> </di>

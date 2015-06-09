@@ -3,11 +3,12 @@
     baseUrl: "./",
     dir: "../release",
     paths: {
-        'backbone':         'libs/backbone',
-        'underscore':       'libs/underscore',
-        'jquery':           'libs/jquery',
-	'jqueryNumeric':    'libs/jquery.numeric',
-	'text':             'libs/text',
+      'backbone':         'libs/backbone',
+      'underscore':       'libs/underscore',
+      'jquery':           'libs/jquery',
+      'jqueryNumeric':    'libs/jquery.numeric',
+      'text':             'libs/text',
+      'dualstorage':      'libs/backbone.dualstorage'
     },
     optimize: "none",
 

@@ -1,6 +1,6 @@
 define([
-    'underscore', 
-    'backbone', 
+    'underscore',
+    'backbone',
     'models/daughter'
 ], function(_, Backbone, Daughter){
     // Daughters は、Rails を通して Kine の daughters を一括してダウンロード
@@ -11,13 +11,15 @@ define([
 
 	model: Daughter,
 
-	url: "/daughters.json?redirect=on&search_owner=",
+	url: "/daughters.json",
 
 	fetch: function(options) {
 	    var server = this.server || "";
 	    if( typeof options === "undefined" || options.owner_id === "" )
 		return;
-	    options.url =  server + this.url + options.owner_id;
+	    options.url =  server + this.url
+                      + "?redirect=on&search_owner="
+                      + options.owner_id;
 	    Backbone.Collection.prototype.fetch.call(this, options);
 	}
     });

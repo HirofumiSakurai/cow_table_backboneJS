@@ -1,0 +1,5 @@
+var global = {
+    server: "";
+};
+
+define([], 

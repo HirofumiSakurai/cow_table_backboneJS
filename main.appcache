@@ -1,0 +1,9 @@
+CACHE MANIFEST
+
+CACHE:
+index.html
+js/main.js
+css/kine.css
+
+NETWORK:
+*

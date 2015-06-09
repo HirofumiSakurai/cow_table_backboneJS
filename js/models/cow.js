@@ -31,24 +31,24 @@ define(['global', 'underscore', 'backbone'], function(global, _, Backbone) {
 	      urlop: _.extend(options, urlop);
       	  this.fetch(options);
       },
-      
+
       fetch: function(options){
 	  this.url = this.root + this.attributes.id;
 	  Backbone.Model.prototype.fetch.call(this, options);
       },
-      
+
       save: function(options){
 	  if( this.attributes.id )
 	      this.url = this.root + this.attributes.id;
 	  Backbone.Model.prototype.save.call(this, options);
       },
-      
+
       destroy: function(options){
 	  if( this.attributes.id )
 	      this.url = this.root + this.attributes.id;
 	  Backbone.Model.prototype.destroy.call(this, options);
       },
-      
+
       create: function(){
 	  this.attributes.id = undefined;
 	  this.url = this.root;
